@@ -3,6 +3,8 @@ ESP8266WebSocketsWebGUI
 
 ESP8266 WebSockets Web GUI MVC application example
 
+ 
+
 Description
 -----------
 
@@ -91,6 +93,65 @@ Principles of operation
 
  
 
+Hardware configuration
+----------------------
+
+The minimal hardware configuration:
+
+-   the only ESP8266 board will always run on default settings and will get a
+    system time by NTP protocol
+
+The maximal hardware configuration:
+
+-   ESP8266 NodeMcu development board
+
+-   [ZS-042 external RTC+EEPROM (DS1307+AT24C32)
+    board](https://ru.aliexpress.com/item/DS3231-AT24C32-IIC-High-Precision-RTC-Module-Clock-Timer-Memory-Module/32666603579.html)
+
+-   [I2C 2004 20X4 character LCD Display
+    board](https://ru.aliexpress.com/item/IIC-I2C-TWI-SP-Interface2004-20x4/32675169557.html)
+
+ 
+
+Installation
+------------
+
+-   install the library https://github.com/Links2004/arduinoWebSockets
+
+in the file WebSockets.h comment the line
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#define WEBSOCKETS_NETWORK_TYPE NETWORK_ESP8266
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+and uncomment the line
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#define WEBSOCKETS_NETWORK_TYPE NETWORK_ESP8266_ASYNC
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+in the file WebSocketsServer.h
+
+replace the line
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#define WEBSOCKETS_SERVER_CLIENT_MAX (5)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+to
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#define WEBSOCKETS_SERVER_CLIENT_MAX (2)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-   install the library https://github.com/me-no-dev/ESPAsyncTCP
+
+-   install the library https://github.com/jfturcot/SimpleTimer
+
+-   install the library https://github.com/pasko-zh/brzo_i2c
+
+ 
+
 Example application default config
 ----------------------------------
 
@@ -142,3 +203,5 @@ ModbusTcpSlave MbTcpSlave = ModbusTcpSlave(502, 1); // TCPport = 502, unit ID =
 \#define I2C_ACK_EEPROM_WRITE 10000 // EEPROM write ACK timeout (10 ms)
 
 \#define EEPROM_MIRROR_SIZE 512 // Max EEPROM usage (bytes)
+
+ 

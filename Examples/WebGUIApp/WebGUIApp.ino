@@ -28,10 +28,12 @@ StatusLed WifiLed = StatusLed();
 #include <ESP8266HTTPClient.h>
 #include <WebSocketsServer.h> //https://github.com/Links2004/arduinoWebSockets
 //depends on: https://github.com/me-no-dev/ESPAsyncTCP
-//in the file WebSockets.h uncomment the line "#define WEBSOCKETS_NETWORK_TYPE NETWORK_ESP8266"
+//in the file WebSockets.h
+//comment the line "#define WEBSOCKETS_NETWORK_TYPE NETWORK_ESP8266"
+//and uncomment the line "#define WEBSOCKETS_NETWORK_TYPE NETWORK_ESP8266_ASYNC"
 //to enable the Async TCP mode!
 //to reduce a memory consumption in the file WebSocketsServer.h replace
-//the line "#define WEBSOCKETS_SERVER_CLIENT_MAX (5)" to "#define WEBSOCKETS_SERVER_CLIENT_MAX  (2)"
+//the line "#define WEBSOCKETS_SERVER_CLIENT_MAX (5)" to "#define WEBSOCKETS_SERVER_CLIENT_MAX (2)"
 
 WebSocketsServer WsServer = WebSocketsServer(81);
 #include <ESP8266WebServer.h>
