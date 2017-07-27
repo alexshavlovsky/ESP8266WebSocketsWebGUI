@@ -1,5 +1,6 @@
 /*
-  WebGUIApp.ino -- ESP8266 WEB GUI example application for Arduino IDE
+  WebGUIAppRTU.ino -- ESP8266 WEB GUI example application for Arduino IDE
+	   	      this version includes Modbus RTU Slave
 
   Copyright (c) 2017 Alex Shavlovsky. All rights reserved.
 
@@ -103,6 +104,16 @@ const char TEXT_HTML[] PROGMEM = "text/html";
 #define ws_bf_size 512
 char ws_bf0[ws_bf_size + WEBSOCKETS_MAX_HEADER_SIZE]; // ws send buffer with header size reserved
 char *ws_bf = &ws_bf0[WEBSOCKETS_MAX_HEADER_SIZE]; // pure payload ws send buffer
+
+//=============MODBUS RTU slave============
+#include <ModbusRtu.h> //https://github.com/alexshavlovsky/Modbus-Master-Slave-for-ESP8266.git
+//forked from https://github.com/smarmengol/Modbus-Master-Slave-for-Arduino.git
+Modbus MbRtuSlave(1, 0, 0);
+//=============MODBUS slave softwareserial============
+//#include <ModbusRtu.h>
+//#include <SoftwareSerial.h>
+//Modbus MbRtuSlave(1);
+//SoftwareSerial mySerial(D3, D4);
 
 String IPToString(IPAddress a) {
     char bf[16];
@@ -357,6 +368,10 @@ void setup() {
         HttpServer.send_P(200, TEXT_HTML, HTML_TEMPLATE); //front-end app
     });
 
+    //===============MODBUS RTU slave init===================
+    MbRtuSlave.begin(115200); // MODBUS RTU
+    //MbRtuSlave.begin(&mySerial,115200); // Soft serial MODBUS RTU
+
     WifiLed.setOn(); // Blink status led while WIFI not connected
 }
 
@@ -378,6 +393,10 @@ void loop() {
         WifiLed.setOff();
     } else WifiLed.setOn();
     tasks.run();
+
+    yield();
+
+    MbRtuSlave.poll(MbTcpSlave.regs, REGS_NUM); //MODBUS RTU registers are shared with Modbus TCP slave
 
     cyclesCount++;
     curMicros = micros();
