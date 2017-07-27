@@ -41,7 +41,7 @@ time_t asyncNtpRun() {
         break;
       }
     case asyncNtpWait: {
-        if (millis() >= beginNtpUdpStart + NTP_UDP_TIMEOUT) {
+        if (millis() - beginNtpUdpStart >= NTP_UDP_TIMEOUT) {
           asyncNtpStatus = asyncNtpIdle;
           Udp.stop();
         }

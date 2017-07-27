@@ -1,6 +1,8 @@
 #ifndef METARPROVIDER_H_
 #define METARPROVIDER_H_
 
+//this library gets METAR air temperature from www.aviationweather.gov by METAR airport id
+
 const char METAR_URL[] PROGMEM = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=";
 
 class MetarProvider {

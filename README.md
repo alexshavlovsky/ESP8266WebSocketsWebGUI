@@ -10,8 +10,8 @@ Description
 
 This library allows to build a ESP8266 Arduino IDE application, that provides a
 real-time user interaction and configuring through a WEB GUI, using a Websocket
-connection and a JavaScript front-end app. User settings are persisted in
-external I2C EEPROM.
+connection and a JavaScript front-end app. User settings are auto mapped and
+persisted in external I2C EEPROM.
 
  
 
@@ -149,6 +149,8 @@ to
 -   install the library https://github.com/jfturcot/SimpleTimer
 
 -   install the library https://github.com/pasko-zh/brzo_i2c
+
+-   install the library https://github.com/PaulStoffregen/Time
 
  
 
