@@ -45,6 +45,8 @@ Key features
 User menu
 ---------
 
+![](https://github.com/alexshavlovsky/ESP8266WebSocketsWebGUI/blob/master/Screenshots/3_board_status.png)
+
 User menu is designed in a horizontal linear layout style and has a multilevel
 hierarchy. The menu consists of items (individual lines). Items are grouped into
 levels (folders). А user can interact with menu items only from his current
