@@ -44,10 +44,6 @@ ModbusTcpSlave MbTcpSlave = ModbusTcpSlave(502, 1); //port = 502, unit id = 1
 
 #include <ESP8266WebSocketsWebGUI.h> // WEB interface and a user side application
 
-#include <MetarProvider.h> // MRTAR weather parser
-
-MetarProvider metar;
-
 #include <SimpleTimer.h> //https://github.com/jfturcot/SimpleTimer
 SimpleTimer tasks;
 
@@ -125,7 +121,6 @@ MenuItem * Menu1[] = {
     new MenuOutputInteger(11, "Free memory", " b", []()->int32_t{return ESP.getFreeHeap();}, 1000),
     new MenuOutputInteger(11, "Average cycle", " &mu;s", []()->int32_t{return avgCycle;}, AVG_CYCLE_CALC_INTERVAL),
     new MenuOutputInteger(11, "Max cycle", " &mu;s", []()->int32_t{return preMaxCycle;}, AVG_CYCLE_CALC_INTERVAL),
-    new MenuOutputInteger(11, "Metar temp", "&deg;C", []()->int32_t{return metar.temp;}, 1000),
 
     new MenuFolder(10, 12, "System time"),
     new MenuOutputString(12, "System time", [](char* bf, size_t bfsz)->void{getFormatedTime(bf, bfsz, LocalTime);}, 1000),
@@ -150,7 +145,7 @@ MenuItem * Menu1[] = {
     new MenuOutputString(14, "Slot 5", [](char* bf, size_t bfsz)->void{getClientIP(bf, bfsz, 4);}, 5000),
     new MenuFolder(1, 20, "Configuration"),
     new MenuInputBoolean(20, "Switch example", 1, "OFF", "ON", ptrBool1),
-    new MenuInputString(20, "METAR station ID", "UMGG", ptrString1),
+    new MenuInputString(20, "String input example", "ESP8266", ptrString1),
     new MenuButton(20, "Clear EEPROM and reset", []()->void{clearEeprom(); ESP.reset();}),
     new MenuFolder(1, 30, "Modbus"),
     new MenuInputInteger(30, "Register 0", 100, "", 0, 1000, ptrInt1),
@@ -204,17 +199,12 @@ void Task_RefreshDisplay() {
     char tmp[20];
     getFormatedTime(tmp, 20, LocalTime);
     lcd.print(tmp);
-    lcd.setCursor(0, 1);
-    if(metar.temp != metar.NOT_SET) lcd.print(metar.temp, 1);
-    else LCDprintLeft(PSTR("not set"), 10);
     lcd.setCursor(11, 1);
     lcd.printf("%04d", *ptrInt1);
     lcd.setCursor(16, 1);
     lcd.printf("%04d", *ptrbootCount);
-    lcd.setCursor(0, 2);
+    lcd.setCursor(0, 1);
     LCDprintLeft(ptrString1, 10);
-    lcd.setCursor(11, 2);
-    lcd.printf("%06d", MbTcpSlave.status.total_requests);
     lcd.setCursor(0, 3);
     if(enWifi) LCDprintLeft("", 10);
     else LCDprintLeft(PSTR("no WiFi"), 10);
@@ -279,10 +269,6 @@ void Task_ServeRefreshMessages() {
     }
 }
 
-void Task_UpdateMetar() {
-    if(enWifi) metar.get(ptrString1);
-}
-
 void Task_WifiLedBlink() {
     WifiLed.run();
 }
@@ -306,7 +292,7 @@ void WsDispatcher(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght) 
             for(MenuItem* a : Menu1) {
                 a->getHTMLCode(num, ws_bf, ws_bf_size);
                 if(ws_bf[0]) SendWSBuffer(num);
-                delay(1);
+//                delay(1);
             }
             break;
         }
@@ -348,7 +334,6 @@ void setup() {
     tasks.setInterval(1000, Task_RefreshDisplay); // LCD redraw
     tasks.setInterval(5000, Task_PingClients); // Ping WS clients
     tasks.setInterval(100, Task_ServeRefreshMessages); // Send model changes to WS clients
-    tasks.setInterval(30 * 60 * 1000, Task_UpdateMetar); // METAR weather get - TODO make it async
     tasks.setInterval(AVG_CYCLE_CALC_INTERVAL, Task_AverageCycleCalc); // Average loop cycle measurement
     tasks.setInterval(10, Task_WifiLedBlink); // Status led service
 
@@ -358,6 +343,7 @@ void setup() {
     });
 
     WifiLed.setOn(); // Blink status led while WIFI not connected
+    Serial.begin(115200);
 }
 
 void loop() {
@@ -370,7 +356,6 @@ void loop() {
         WsServer.begin();
         HttpServer.begin();
         MbTcpSlave.begin();
-        Task_UpdateMetar();
     }
     if(enWifi) {
         HttpServer.handleClient();
