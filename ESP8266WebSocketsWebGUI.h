@@ -336,10 +336,12 @@ class MenuOutputInteger: public MenuItem {
     const char* MPName;
     int32_t MPVal;
     const char* MPDimens;
-    bool UpdateVal() {
-        if(refreshTimer->onSample()) {
+    bool inited;
+    bool UpdateVal(bool force) {
+        if((!inited&&force)||refreshTimer->onSample()) {
             int32_t preVal=MPVal;
             MPVal = geterF();
+	    inited=true;
 	    return (MPVal!=preVal);
         } else return false;
     };
@@ -347,16 +349,18 @@ public:
     MenuOutputInteger(uint8_t Lvl, const char* PName, const char* PDimens, std::function<int32_t(void)> getF, uint32_t UpdatePeriod) :
         MenuItem(Lvl), MPName(PName), MPDimens(PDimens), geterF(getF) {
         refreshTimer->setPeriod(UpdatePeriod);
+	inited=false;
     };
     void getHTMLCode(uint8_t ClientN,char* bf,size_t bfsz) {
         if(clientLevel[ClientN] == itemLevel) {
-            snprintf_P(bf, bfsz, HTML_MPOUTINT, MPName, itemIndex, geterF(), MPDimens);
+	    UpdateVal(true);
+            snprintf_P(bf, bfsz, HTML_MPOUTINT, MPName, itemIndex, MPVal, MPDimens);
         } else bf[0] = '\0';
     };
     void getRefreshMessage(char* bf,size_t bfsz) {
         bf[0] = '\0';
         for(uint8_t ClientN=0; ClientN<5; ClientN++)
-            if((clientLevel[ClientN] == itemLevel)&&(UpdateVal())) {
+            if((clientLevel[ClientN] == itemLevel)&&(UpdateVal(false))) {
                 snprintf(bf, bfsz, "P%d=%d", itemIndex, MPVal);
                 break;
             }
@@ -368,11 +372,13 @@ class MenuOutputString: public MenuItem {
     std::function<void(char *,size_t)> geterF;
     const char* MPName;
     char MPStr[STRING_OUTPUT_MAX_LENGTH];
-    bool UpdateVal() {
-        char preStr[STRING_OUTPUT_MAX_LENGTH];
-        strcpy(preStr,MPStr);
-        if(refreshTimer->onSample()) {
+    bool inited;
+    bool UpdateVal(bool force) {
+        if((!inited&&force)||refreshTimer->onSample()) {
+            char preStr[STRING_OUTPUT_MAX_LENGTH];
+            strcpy(preStr,MPStr);
             geterF(&MPStr[0],sizeof(MPStr));
+	    inited=true;
             return (strcmp(preStr,MPStr)!=0);
         } else return false;
     };
@@ -380,18 +386,18 @@ public:
     MenuOutputString(uint8_t Lvl, const char* PName, std::function<void(char*,size_t)> getF, uint32_t UpdatePeriod) :
         MenuItem(Lvl), MPName(PName), geterF(getF) {
         refreshTimer->setPeriod(UpdatePeriod);
+	inited=false;
     };
     void getHTMLCode(uint8_t ClientN,char* bf,size_t bfsz) {
         if(clientLevel[ClientN] == itemLevel) {
-            char tmpStr[STRING_OUTPUT_MAX_LENGTH];
-            geterF(&tmpStr[0],sizeof(tmpStr));
-            snprintf_P(bf, bfsz, HTML_MPOUTSTR, MPName, itemIndex, tmpStr);
+            UpdateVal(true);
+            snprintf_P(bf, bfsz, HTML_MPOUTSTR, MPName, itemIndex, MPStr);
         } else bf[0] = '\0';
     };
     void getRefreshMessage(char* bf,size_t bfsz) {
         bf[0] = '\0';
         for(uint8_t ClientN=0; ClientN<5; ClientN++)
-            if((clientLevel[ClientN] == itemLevel) && (this->UpdateVal())) {
+            if((clientLevel[ClientN] == itemLevel) && (this->UpdateVal(false))) {
                 snprintf(bf,bfsz,"P%d=%s", itemIndex, MPStr);
                 break;
             }
