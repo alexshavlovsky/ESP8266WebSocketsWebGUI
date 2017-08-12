@@ -151,7 +151,7 @@ public:
 
     bool run() {
 	bool evnt=false;
-        status.clients_num=0;
+	uint8_t clnt_count=0;
         for(int i = 0; i < MAX_CLNT_NUM; i++) {
             if(cltnAlive[i]&&millis() > time_estab[i] + CON_KEEP_ALIVE) { // if connection timeout - disconnect this client
                 cltnAlive[i]=0;
@@ -176,11 +176,12 @@ public:
                     }
                 }
             }
-            if(cltnAlive[i])status.clients_num++;
+            if(cltnAlive[i]) clnt_count++;
         }
-        if(status.clients_num==MAX_CLNT_NUM) {
+        if(clnt_count==MAX_CLNT_NUM) {
             while(MBServer.hasClient()&&MBServer.available()) yield();   //clear the queue and refuse the connection to avoid a queue overflow
         }
+	status.clients_num=clnt_count;
 	return evnt;
     }
 };
