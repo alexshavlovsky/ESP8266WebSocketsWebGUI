@@ -1,9 +1,9 @@
 /*
   WebGUIAppBME.ino -- ESP8266 WEB GUI example application for Arduino IDE
-  This version demonstrates real-time charts using measurements from
+  This version demonstrates realtime charts using measurements from
   the BME280 sensor
   ESP8266 core v.2.4.0-rc1 is needed
-  depens on https://github.com/alexshavlovsky/BME280.git
+  depends on https://github.com/alexshavlovsky/BME280.git
 
   Copyright (c) 2017 Alex Shavlovsky. All rights reserved.
 

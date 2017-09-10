@@ -14,11 +14,11 @@ ESP8266 WebSockets Web GUI MVC application example
 - MenuOutputChart MenuItem added allows to draw realtime charts
   using Smoothie Charts JS library (smoothiecharts.org)
 - Migrate to ESP8266 core v.2.4.0-rc1 to enable proper
-  floating point formatting whith sprintf function
+  floating point formatting with sprintf function
 - Example app included (WebGUIAppBME.ino) that demonstrates
   real-time charts using measurements from the BME280 sensor
 
-![](https://github.com/alexshavlovsky/ESP8266WebSocketsWebGUI/blob/master/Screenshots/9_bme280.png)
+![](Screenshots/9_bme280.png?raw=true)
 
 
 Description
@@ -61,7 +61,11 @@ Key features
 User menu
 ---------
 
-![](https://github.com/alexshavlovsky/ESP8266WebSocketsWebGUI/blob/master/Screenshots/3_board_status.png)
+<p align="center">
+  <img src="Screenshots/2_system_info.png?raw=true"/>
+  <img src="Screenshots/3_board_status.png?raw=true"/>
+  <img src="Screenshots/4_system_time.png?raw=true"/>
+</p>
 
 User menu is designed in a horizontal linear layout style and has a multilevel
 hierarchy. The menu consists of items (individual lines). Items are grouped into
