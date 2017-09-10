@@ -65,9 +65,9 @@ User menu
 ---------
 
 <p align="center">
-  <img src="Screenshots/2_system_info.png?raw=true"/>
-  <img src="Screenshots/3_board_status.png?raw=true"/>
-  <img src="Screenshots/4_system_time.png?raw=true"/>
+  <img src="Screenshots/2_system_info.png?raw=true" width="250"/>
+  <img src="Screenshots/3_board_status.png?raw=true" width="250"/>
+  <img src="Screenshots/4_system_time.png?raw=true" width="250"/>
 </p>
 
 User menu is designed in a horizontal linear layout style and has a multilevel
