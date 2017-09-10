@@ -18,10 +18,17 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+// v1.0: First release
+// v1.1: * MenuOutputChart MenuItem added allows to draw realtime charts
+//	 using Smoothie Charts JS library (smoothiecharts.org)
+//       * Migrate to ESP8266 core v.2.4.0-rc1 to enable proper
+//       floating point formatting in sprintf function
+
 #ifndef WEBSOCKETSMENU_H_
 #define WEBSOCKETSMENU_H_
 
 #include <DiscretTimer.h>
+#include <SmoothieJS.h>
 #define OUTPUTS_MIN_REFRESH_INTERVAL 1000
 #define STRING_OUTPUT_MAX_LENGTH 32
 
@@ -32,10 +39,12 @@ const char HTML_TEMPLATE[] PROGMEM =
 "<title>ESP menu</title>\n"
 "<meta charset=\"utf-8\">\n"
 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+"<script src=\"smoothie.js\"></script>\n"
 "<style>\n"
 "body {margin:0 0;}\n"
 "#menu div{padding:8px 0;display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;border-bottom:1px solid #DDD;font-family:Lucida Sans Unicode;}\n"
 "#menu div.top{border-bottom:3px solid #888;}\n"
+"#menu div.schart{height:128px;}\n"
 "#menu p{margin:0 0;word-break:break-all;flex-grow:1;font-size:18px;line-height:24px;}\n"
 "#menu input[type=text]{width:100%;font-size:16px;padding:4px 8px;margin:2px 0;display:inline-block;border:1px solid #DDD;border-radius:4px;box-sizing:border-box;}\n"
 "#menu input[type=text]:focus{border:1px solid #888;}\n"
@@ -86,6 +95,9 @@ const char HTML_TEMPLATE[] PROGMEM =
 "<symbol id=\"b-0\" viewBox=\"0 0 24 24\">\n"
 "<path d=\"M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z\"/>\n"
 "</symbol>\n"
+//"<symbol id=\"i-ch\" viewBox=\"0 0 24 24\">\n"
+//"<path d=\"M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z\"/>\n"
+//"</symbol>\n"
 "</svg>\n"
 "<div id=\"menu\">\n"
 "<div class=\"top\">\n"
@@ -94,6 +106,16 @@ const char HTML_TEMPLATE[] PROGMEM =
 "</div>\n"
 "</div>\n"
 "<script>\n"
+"var charts=[];\n"
+"function Chart(parent) {\n"
+"this.cnv = document.createElement(\"canvas\");\n"
+"this.cnv.width = parent.offsetWidth;\n"
+"this.cnv.height = parent.offsetHeight;\n"
+"parent.appendChild(this.cnv);\n"
+"this.smoothie = new SmoothieChart({millisPerPixel:100,grid:{fillStyle:'#ffffff'},labels:{fillStyle:'#000000',precision:1}});\n"
+"this.smoothie.streamTo(this.cnv);\n"
+"this.line = new TimeSeries();\n"
+"this.smoothie.addTimeSeries(this.line,{lineWidth:2,strokeStyle:'#000000'});}\n"
 "var v_id;\n"
 "var v_0=0;\n"
 "var v_s=0;\n"
@@ -113,18 +135,36 @@ const char HTML_TEMPLATE[] PROGMEM =
 "if (e.data.charAt(0)==='P'&&v_t===0){\n"
 "arr=e.data.split('=');\n"
 "document.getElementById(arr[0]).innerHTML = arr[1];}\n"
+"if (e.data.charAt(0)==='C') {\n"
+"var tmp1=e.data.substring(1,e.data.indexOf('='));\n"
+"var tmp2=e.data.substring(e.data.indexOf('=')+1);\n"
+"document.getElementById('F'+tmp1).innerHTML=tmp2;\n"
+"if (charts[tmp1]!=undefined) charts[tmp1].line.append(new Date().getTime(),tmp2);"
+"}\n"
 "if (e.data.charAt(0)==='D') {\n"
 "var tmp1=e.data.substring(0,e.data.indexOf('='));\n"
 "var tmp2=e.data.substring(e.data.indexOf('=')+1);\n"
-"console.log('t1: '+tmp1);\n"
-"console.log('t2: '+tmp2);\n"
 "document.getElementById(tmp1).innerHTML=tmp2;\n"
 "}\n"
 "if (e.data.charAt(0)==='x'){\n"
-"document.getElementById(\"menu\").innerHTML = '';}\n"
+"var tmp=document.getElementById('menu');\n"
+"while (tmp.firstChild) tmp.removeChild(tmp.firstChild);}\n"
 "if (e.data.charAt(0)==='<'){\n"
-"document.getElementById(\"menu\").innerHTML += e.data;}\n"
-"}\n"
+"var tmp=createElement(e.data);\n"
+"document.getElementById(\"menu\").appendChild(tmp);\n"
+"var stmp=e.data.indexOf('schart');\n"
+"if (stmp!=-1){\n"
+"var t=e.data.substring(stmp+13,e.data.indexOf('\\\"',stmp+13));\n"
+"if (charts[t]==undefined) {charts[t]=new Chart(document.getElementById('C'+t));} else\n"
+"{document.getElementById('C'+t).appendChild(charts[t].cnv);}\n"
+"}}}\n"
+"function createElement( str ) {\n"
+"var frag = document.createDocumentFragment();\n"
+"var elem = document.createElement('div');\n"
+"elem.innerHTML = str;\n"
+"while (elem.childNodes[0]) {\n"
+"frag.appendChild(elem.childNodes[0]);}\n"
+"return frag;}\n"
 "function v_print(){\n"
 "document.getElementById(v_id).innerHTML = \"<span style=\\\"color:red;\\\">\"+(v_0+v_d*v_s)+\"</span>\";\n"
 "}\n"
@@ -199,6 +239,19 @@ const char HTML_MPOUTINT[] PROGMEM =
 //%d - param id
 //%d - param value
 //%s - param dimension
+
+const char HTML_MPOUTCHART[] PROGMEM =
+"<div>\n"
+"<p>%s <i id=\"F%d\">%.03f</i><i>%s</i></p>\n"
+"</div>\n"
+"<div class=\"schart\" id=\"C%d\">\n"
+//"<span><svg><use xlink:href=\"#i-ch\"></use></svg></span>\n"
+"</div>\n";
+//%s - param name
+//%d - param id
+//%.03f - param value
+//%s - param dimension
+//%d - param id
 
 const char HTML_MPOUTSTR[] PROGMEM =
 "<div>\n"
@@ -362,6 +415,43 @@ public:
         for(uint8_t ClientN=0; ClientN<5; ClientN++)
             if((clientLevel[ClientN] == itemLevel)&&(UpdateVal(false))) {
                 snprintf(bf, bfsz, "P%d=%d", itemIndex, MPVal);
+                break;
+            }
+    };
+};
+
+class MenuOutputChart: public MenuItem {
+    DiscretTimer* refreshTimer = new DiscretTimer(OUTPUTS_MIN_REFRESH_INTERVAL);
+    std::function<float(void)> geterF;
+    const char* MPName;
+    float MPVal;
+    const char* MPDimens;
+    bool inited;
+    bool UpdateVal(bool force) {
+        if((!inited&&force)||refreshTimer->onSample()) {
+            float preVal=MPVal;
+            MPVal = geterF();
+	    inited=true;
+	    return true;//(MPVal!=preVal);
+        } else return false;
+    };
+public:
+    MenuOutputChart(uint8_t Lvl, const char* PName, const char* PDimens, std::function<float(void)> getF, uint32_t UpdatePeriod) :
+        MenuItem(Lvl), MPName(PName), MPDimens(PDimens), geterF(getF) {
+        refreshTimer->setPeriod(UpdatePeriod);
+	inited=false;
+    };
+    void getHTMLCode(uint8_t ClientN,char* bf,size_t bfsz) {
+        if(clientLevel[ClientN] == itemLevel) {
+	    UpdateVal(true);
+            snprintf_P(bf, bfsz, HTML_MPOUTCHART, MPName, itemIndex, MPVal, MPDimens, itemIndex);
+        } else bf[0] = '\0';
+    };
+    void getRefreshMessage(char* bf,size_t bfsz) {
+        bf[0] = '\0';
+        for(uint8_t ClientN=0; ClientN<5; ClientN++)
+            if((clientLevel[ClientN] == itemLevel)&&(UpdateVal(false))) {
+                snprintf(bf, bfsz, "C%d=%.03f", itemIndex, MPVal);
                 break;
             }
     };
