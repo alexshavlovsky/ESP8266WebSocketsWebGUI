@@ -20,7 +20,7 @@ ESP8266 WebSockets Web GUI MVC application example
 
 <p align="center">
   <img src="Screenshots/9_bme280.png?raw=true"/>
-  <img src="Screenshots/bme_prototype.jpg?raw=true"/>
+  <img src="Screenshots/bme_prototype.jpg?raw=true" width="360"/>
 </p>
 
 
