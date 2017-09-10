@@ -3,7 +3,23 @@ ESP8266WebSocketsWebGUI
 
 ESP8266 WebSockets Web GUI MVC application example
 
- 
+10.09.2017 - Realtime charts with SmoothieCharts.js upgrade
+
+- SmoothieCharts.js library included (SmoothieJS.h)
+- Moving average filter included (FilterAVG.h)
+- BME280 sensor library forked (https://github.com/finitespace/BME280)
+  and now it is compatible with brzo_i2c
+  (install https://github.com/alexshavlovsky/BME280.git)
+- ESP8266WebSocketsWebGUI.h upgraded to v1.1
+- MenuOutputChart MenuItem added allows to draw realtime charts
+  using Smoothie Charts JS library (smoothiecharts.org)
+- Migrate to ESP8266 core v.2.4.0-rc1 to enable proper
+  floating point formatting whith sprintf function
+- Example app included (WebGUIAppBME.ino) that demonstrates
+  real-time charts using measurements from the BME280 sensor
+
+![](https://github.com/alexshavlovsky/ESP8266WebSocketsWebGUI/blob/master/Screenshots/8_bme280.png)
+
 
 Description
 -----------
