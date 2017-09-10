@@ -187,6 +187,10 @@ to
 -   install the library https://github.com/PaulStoffregen/Time
 
 -   install the library https://github.com/alexshavlovsky/BME280
+    to support the BME280 sensor
+
+-   install the library https://github.com/alexshavlovsky/Modbus-Master-Slave-for-ESP8266
+    to support MODBUS RTU protocol
  
 
 Example application default config
