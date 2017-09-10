@@ -44,7 +44,7 @@ Key features
     [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) and
     [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP) libraries
 
--   400 kHz I2C RTC, EEPROM and LCD drivers based on
+-   400 kHz I2C RTC, EEPROM, LCD and BME280 drivers based on
     [brzo_i2c](https://github.com/pasko-zh/brzo_i2c) library
 
 -   time management and synchronization (non-blocking NTP and external I2C RTC)
@@ -93,7 +93,14 @@ folder. The supported menu items are as follows:
 -   **MenuButton** - represents a button; when clicked, the corresponding
     call-back function is called
 
- 
+-   **MenuOutputChart** - draws realtime chart of float variable.
+    Needs ESP8266 core v.2.4.0-rc1
+
+-   **EEPROMuint16** - persists to EEPROM uint16_t variable and
+    has no visual representation. For example it is used for counting
+    the number of boot cycles
+
+
 
 Principles of operation
 -----------------------
@@ -136,6 +143,8 @@ The maximal hardware configuration:
 -   [I2C 2004 20X4 character LCD Display
     board](https://ru.aliexpress.com/item/IIC-I2C-TWI-SP-Interface2004-20x4/32675169557.html)
 
+-   [BME280 digital sensor
+    board](https://ru.aliexpress.com/item/BME280-Digital-Sensor-Temperature-Humidity-Barometric-Pressure-Sensor-New/32665342978.html)
  
 
 Installation
@@ -177,6 +186,7 @@ to
 
 -   install the library https://github.com/PaulStoffregen/Time
 
+-   install the library https://github.com/alexshavlovsky/BME280
  
 
 Example application default config
