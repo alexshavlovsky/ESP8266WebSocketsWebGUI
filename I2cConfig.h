@@ -25,7 +25,7 @@
 #define EEPROM_I2C_ADDRESS 0x57
 #define RTC_I2C_ADDRESS 0x68
 #define LCD_I2C_ADDRESS 0x3F
-
+#define BME_I2C_ADDRESS 0x76
 #define I2C_CLOCK_RATE 400
 #define I2C_ACK_TIMEOUT 2000
 #define I2C_ACK_EEPROM_WRITE 10000
@@ -35,6 +35,7 @@
 bool enLcd=false;
 bool enRtc=false;
 bool enEeprom=false;
+bool enBme=false;
 
 bool pingI2cDevice(uint8_t devAddr) { // check I2C device alive
     brzo_i2c_start_transaction(devAddr, I2C_CLOCK_RATE);
@@ -46,6 +47,7 @@ void getI2cDevices(){ // ping all supported devices
   enLcd=pingI2cDevice(LCD_I2C_ADDRESS);
   enRtc=pingI2cDevice(RTC_I2C_ADDRESS);
   enEeprom=pingI2cDevice(EEPROM_I2C_ADDRESS);
+  enBme=pingI2cDevice(BME_I2C_ADDRESS);
 }
 
 void initI2c(){
