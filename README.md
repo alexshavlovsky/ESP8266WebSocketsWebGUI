@@ -18,7 +18,7 @@ ESP8266 WebSockets Web GUI MVC application example
 - Example app included (WebGUIAppBME.ino) that demonstrates
   real-time charts using measurements from the BME280 sensor
 
-![](https://github.com/alexshavlovsky/ESP8266WebSocketsWebGUI/blob/master/Screenshots/8_bme280.png)
+![](https://github.com/alexshavlovsky/ESP8266WebSocketsWebGUI/blob/master/Screenshots/9_bme280.png)
 
 
 Description
